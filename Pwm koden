@@ -1,0 +1,58 @@
+/*
+ * lab2_ledWithPulseModulation.c
+ *
+ * Created: 2023-02-15 14:23:02
+ * Author : sonny
+ */ 
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+
+int main(void)
+{
+ DDRB =0xff;   
+	timer3_init();
+	
+    while (1) {
+		for(int i = 0; i<5; i++){
+			// I have not tested these values, just guessed them, so change them if needed. I think we want a
+			// range of about 30 degrees in the end. Test by building a board with LEDs connected to the sensor.
+
+			// We don't want delays in the end, we want code that will take the same time to execute instead.
+			// The Delays won't be right now tho since i changed the pulse,
+			// so you can change them to make the movement of the servo seamless.
+			set_pulse(1700);				
+			_delay_ms(500); 				
+			set_pulse(1500);
+			_delay_ms(500);
+			set_pulse(1300);
+			_delay_ms(500);
+			set_pulse(1100);
+			_delay_ms(500);
+			set_pulse(1300);
+			_delay_ms(500);
+			set_pulse(1500);
+			_delay_ms(500);
+		}
+    }
+}
+void timer3_init(){
+	TCCR3A = 0b10000010;
+	TCCR3B = 0b00011010;
+	set_pulse(1400);
+	set_period(20000);
+}
+// Because of the prescaler of 8, and that the processor is defined as 8 Mhz, the pulse can be defined as microseconds.
+// The pulse equals the direction of the sensor. A pulse of about 1400 microseconds = 90 degrees.
+// And should probably be where we want it in the beginning of the program.
+void set_pulse(uint16_t a){
+	OCR3A = a;
+}
+// Because of the prescaler of 8, and that the processor is defined as 8 Mhz, the period can be defined as microseconds.
+// This is to be set at 20000 or 20000+(whatever the pulse is) because we want a 20ms period.
+// Not sure which one, but both works fine for now. I think it should be 20000.
+void set_period(uint16_t b){
+	ICR3 = b;
+}
+
