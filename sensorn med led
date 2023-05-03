@@ -1,0 +1,50 @@
+/*
+ * GccApplication3.c
+ *
+ * Created: 2023-05-03 09:33:34
+ * Author : sonny
+ */ 
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void){
+	
+	adc_init();
+	DDRB = 0xFF;
+	while(1) {
+		
+		
+		if(read_sensor()){
+			PORTB = 0xff;
+		}
+		else{
+			PORTB = 0x00;
+		}
+		//_delay_ms(100);
+	}
+
+}
+int read_sensor(){
+
+	if (adc_read() > 150 && adc_read() < 300){
+		return 1;
+	} return 0;
+}
+void adc_init(){
+	DDRA |= 0b00000000; //hela a är inputs
+	ADCSRA |= (1 << ADEN);
+	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+	ADMUX |= (1 << REFS0) |(1 << REFS0) ; //referensspänning 
+
+	
+}
+
+
+int adc_read(){
+	//här måste vi sätta ett register som input
+	//PRR0 = 0b00000000;	
+	ADCSRA |= (1<<ADSC);
+	while(ADCSRA&(1<<ADSC)){} //vänta på adc conversionen
+	return ADC;
+}
